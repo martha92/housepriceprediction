@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Fri Nov 30 04:13:52 PST 2018:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.12.1.1 - (1704137): instance a816c00e-0167-648a-1b63-00001ee7be68 
+on database directory /home/idey/housepriceprediction-master/Code/metastore_db with class loader org.apache.spark.sql.hive.client.IsolatedClientLoader$$anon$1@4c727a8 
+Loaded from file:/home/envmodules/lib/spark-2.3.1-bin-hadoop2.7/jars/derby-10.12.1.1.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_191-b12
+user.dir=/home/idey/housepriceprediction-master/Code
+os.name=Linux
+os.arch=amd64
+os.version=4.4.0-134-generic
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
