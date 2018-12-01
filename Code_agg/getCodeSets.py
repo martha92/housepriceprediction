@@ -6,7 +6,7 @@ from pyspark.sql import SparkSession, functions, types
 from pandas.io.json import json_normalize
 import pandas as pd
 import json
-spark = SparkSession.builder.appName('Get Code Sets').getOrCreate()
+spark = SparkSession.builder.appName('Get Code_agg Sets').getOrCreate()
 
 
 
