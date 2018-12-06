@@ -7,7 +7,7 @@ Prediction scope-> This project is predicting the house price by province across
 
 Data source-> 	Statistics Canada
 				Government of Canada
-				Listing price(<!-------FILL OUT THE SOURCE SITE!)
+				Listing price(point2homes.com)
 
 Extraction->	Web services, csv's, web crawling.
 
