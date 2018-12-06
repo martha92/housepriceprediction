@@ -24,18 +24,17 @@ def main(inputs):
     types.StructField('Area', types.StringType(), True),
     types.StructField('monthyr', types.StringType(), True),
     types.StructField('PriceperSqft', types.StringType(), True),
-    types.StructField('Age', types.StringType(), True),
-    types.StructField('DateAdd', types.StringType(), True),
+    types.StructField('Age', types.StringType(), True)
     ])
     listingdata = spark.read.csv(inputs, schema=listing_schema).createOrReplaceTempView('listingdata')
-    listingdata1 = spark.sql('select * from listingdata where locality is not null').createOrReplaceTempView('listingdata1')
-    listingdata2 = spark.sql('select locality, avg(PriceperSqft) as avgprice from listingdata1 group by locality').createOrReplaceTempView('listingdata2')
-    listingdata3 = spark.sql('select listingdata1.province, listingdata1.postal_code, listingdata2.avgprice, listingdata2.locality from listingdata1,listingdata2 where listingdata1.locality = listingdata2.locality').createOrReplaceTempView('listingdata3')
-    listingdata4 = spark.sql('select max(avgprice) as maxprice, province from listingdata3 group by province').createOrReplaceTempView('listingdata4')
-    listingdata5 = spark.sql('select listingdata4.province, listingdata4.maxprice, listingdata3.postal_code, listingdata3.locality from listingdata4 inner join listingdata3  on listingdata4.maxprice=listingdata3.avgprice').createOrReplaceTempView('listingdata5')
-    listingdata6 = spark.sql('select distinct(locality), postal_code, province, maxprice from listingdata5').show()#.coalesce(1)
-    #listingdata6.write.format("csv").save(output)
-    
+    listingdata1 = spark.sql('select cast(listprice as double) as listprice, province from listingdata').createOrReplaceTempView('listingdata1')
+    provdf = spark.sql('select province, max(listprice) as maxprice, min(listprice) as minprice, avg(listprice) as avgprice from listingdata1 group by province').show()
+    maxdf = spark.sql('select province, max(listprice) as maxprice from listingdata1 group by province').createOrReplaceTempView('maxdf')
+    maxdf = spark.sql('select listingdata.*, maxdf.maxprice from listingdata, maxdf where listingdata.listprice=maxdf.maxprice').show()
+    mindf = spark.sql('select province, min(listprice) as minprice from listingdata1 group by province').createOrReplaceTempView('mindf')
+    mindf = spark.sql('select listingdata.*, mindf.minprice from listingdata, mindf where listingdata.listprice=mindf.minprice').show()
+
+
 if __name__ == '__main__':
     inputs = sys.argv[1]
     #output = sys.argv[2]

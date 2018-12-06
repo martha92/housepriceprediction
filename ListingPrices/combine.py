@@ -3,7 +3,6 @@
 
 import os
 import glob
-import pandas
 import csv
 
 files =glob.glob('/Users/shree/BDP/Project/listingprices/csvs/*.csv')

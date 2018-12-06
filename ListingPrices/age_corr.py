@@ -1,6 +1,6 @@
 import sys
 assert sys.version_info >= (3, 5) # make sure we have Python 3.5+
-
+import math
 from pyspark.sql import SparkSession, functions, types
 from pyspark.sql.types import StringType
 from pyspark.sql.functions import udf
@@ -28,12 +28,16 @@ def main(inputs):
     types.StructField('DateAdd', types.StringType(), True),
     ])
     listingdata = spark.read.csv(inputs, schema=listing_schema).createOrReplaceTempView('listingdata')
-    listingdata1 = spark.sql('select * from listingdata where locality is not null').createOrReplaceTempView('listingdata1')
-    listingdata2 = spark.sql('select locality, avg(PriceperSqft) as avgprice from listingdata1 group by locality').createOrReplaceTempView('listingdata2')
-    listingdata3 = spark.sql('select listingdata1.province, listingdata1.postal_code, listingdata2.avgprice, listingdata2.locality from listingdata1,listingdata2 where listingdata1.locality = listingdata2.locality').createOrReplaceTempView('listingdata3')
-    listingdata4 = spark.sql('select max(avgprice) as maxprice, province from listingdata3 group by province').createOrReplaceTempView('listingdata4')
-    listingdata5 = spark.sql('select listingdata4.province, listingdata4.maxprice, listingdata3.postal_code, listingdata3.locality from listingdata4 inner join listingdata3  on listingdata4.maxprice=listingdata3.avgprice').createOrReplaceTempView('listingdata5')
-    listingdata6 = spark.sql('select distinct(locality), postal_code, province, maxprice from listingdata5').show()#.coalesce(1)
+    listingdata1 = spark.sql('select (cast(Age as double)) as x, (cast(listprice as double)) as y, 1 as cnt from listingdata where Age is not null').createOrReplaceTempView('listingdata1')
+    listingdata2 = spark.sql('select x, y, cnt, x*x as x2, y*y as y2, x*y as xy from listingdata1 ').createOrReplaceTempView('listingdata2')
+    listingdata3 = spark.sql('select sum(x), sum(y), sum(cnt), sum(x2), sum(y2), sum(xy) from listingdata2')#.createOrReplaceTempView('listingdata3')
+    
+    lst = listingdata3.collect()
+    p = math.sqrt((lst[0][2]*lst[0][3]) - (lst[0][0]**2))
+    q = math.sqrt((lst[0][2]*lst[0][4]) - (lst[0][1]**2))
+    r = ((lst[0][2]*lst[0][5])-(lst[0][0]*lst[0][1])) / (p*q)
+    print("r=",r)
+    print("r^2=", (r*r))
     #listingdata6.write.format("csv").save(output)
     
 if __name__ == '__main__':

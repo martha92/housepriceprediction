@@ -8,11 +8,11 @@ from scrapy.linkextractors import LinkExtractor
 class P2hSpider(scrapy.Spider):
     name = 'p2h'
     allowed_domains = ['point2homes.com']
-    start_urls = [ 'https://www.point2homes.com/CA/Real-Estate-Listings/YT.html']
+    start_urls = [ 'https://www.point2homes.com/CA/Real-Estate-Listings/BC.html']
                   
     #download_delay = 2.0
     '''
-    [''https://www.point2homes.com/CA/Real-Estate-Listings/BC.html',
+    ['https://www.point2homes.com/CA/Real-Estate-Listings/BC.html',
     'https://www.point2homes.com/CA/Real-Estate-Listings/BC.html?page=3',
     'https://www.point2homes.com/CA/Real-Estate-Listings/AB.html',
     'https://www.point2homes.com/CA/Real-Estate-Listings/AB.html?page=3',
@@ -122,4 +122,5 @@ class P2hSpider(scrapy.Spider):
          'year built':yr_built, 'taxes':tax, 'Basement': basement, 'Lot Size': lot_size, 'Bed': bed, 'Baths': bath, 'Area': area}
 
 
+        
         
