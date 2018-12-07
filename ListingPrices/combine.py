@@ -1,6 +1,6 @@
 
 
-
+#combining csv files into one csv file
 import os
 import glob
 import csv
