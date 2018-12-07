@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#scrapy spider for crawling the web and scraping data
 import scrapy
 from scrapy.selector import Selector
 from scrapy.http import HtmlResponse
