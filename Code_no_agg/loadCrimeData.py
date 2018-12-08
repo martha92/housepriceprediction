@@ -43,7 +43,11 @@ def download_extract_zip(url):
                 df = pd.read_csv(thefile)
                 return (df)
 
-
+'''
+	 * Description: This method is used to request crime information, perform transformations and generate an output dataframe 
+	 * input: -
+	 * output:  DataFrame-> with crime info per province and year-month
+'''
 def loadCrimeData():
     # PRODUCT ID FOR CRIME INFO.
     productId = "35100177"
