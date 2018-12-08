@@ -28,7 +28,7 @@ from keras.models import load_model
 # uploaded = files.upload()
 # import io
 # data = pd.read_csv(io.StringIO(uploaded['data.csv'].decode('utf-8')))
-data = pd.read_csv('Other_sources/data.csv')
+data = pd.read_csv('Code_no_agg/data.csv')
 
 # Removing the unwanted features
 
