@@ -157,7 +157,7 @@ predicted_train_df = pd.DataFrame({'REF_DATE': trainT, 'DGUID': trainD, 'predict
 predicted_df = pd.concat([predicted_train_df, predicted_valid_df])
 
 model.save('Result/lstm_model.h5')
-pd.merge(data, predicted_df, on=['REF_DATE', 'DGUID']).to_csv("Result/data_lstm.csv", header='true')
+pd.merge(data, predicted_df, on=['REF_DATE', 'DGUID']).to_csv("Output/data_lstm.csv", header='true')
 
 # Produce a plot for the validation/test results.
 
