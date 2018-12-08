@@ -5,8 +5,8 @@ import os
 import glob
 import csv
 
-files =glob.glob('/Users/shree/BDP/Project/listingprices/csvs/*.csv')
-out = csv.writer(open('/Users/shree/BDP/Project/listingprices/listingdata.csv', 'w'), delimiter = ',')
+files =glob.glob('ListingPrices/csvs/*.csv')
+out = csv.writer(open('ListingPrices/listingdata.csv', 'w'), delimiter = ',')
 #out.writerow(['province', 'listprice', 'date added', 'locality', 'postal code',
          #'year built', 'taxes', 'Basement', 'Lot Size', 'Bed', 'Baths', 'Area'])
 
