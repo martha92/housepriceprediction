@@ -8,8 +8,8 @@ from pyspark.sql import SparkSession, types
 from io import *
 import pandas as pd
 from urllib.request import *
-spark = SparkSession.builder.master("local[*]").config("spark.executor.memory", "70g").config("spark.driver.memory", "50g").config("spark.memory.offHeap.enabled",True).config("spark.memory.offHeap.size","32g").config("spark.driver.maxResultSize","10g").appName("Load Labour Force Data").getOrCreate()
 
+#Schema for immigration information
 immigration_schema = types.StructType([
 	types.StructField('REF_DATE', types.StringType(), True),
 	types.StructField('GEO', types.StringType(), True),
@@ -17,11 +17,13 @@ immigration_schema = types.StructType([
     types.StructField('In_migrants', types.IntegerType(), True),
     types.StructField('Out_migrants', types.IntegerType(), True),])
 
+
+'''
+	 * Description: This method is used to download and extract the zip file contents in memory.
+	 * input: String -> url of response.
+	 * output:  -> Panda DataFrame -> file contents.
+'''
 def download_extract_zip(url):
-    """
-    Download a ZIP file and extract its contents in memory
-    yields (filename, file-like object) pairs
-    """
     response = requests.get(url)
     with ZipFile(BytesIO(response.content)) as thezip:
         for zipinfo in thezip.infolist():
@@ -29,6 +31,11 @@ def download_extract_zip(url):
             	df = pd.read_csv(thefile)
             	return (df)
 
+'''
+	 * Description: This method is used to request immigration information, perform transformations and generate an output dataframe 
+	 * input: -
+	 * output:  DataFrame-> with immigration info per province and year-month
+'''
 def loadImmigrationData():
 	#PRODUCT ID FOR .
     productId = "17100020"
@@ -36,6 +43,7 @@ def loadImmigrationData():
     jdata = json.loads(response.text)
     zipUrl = jdata['object']
     pdDF = download_extract_zip(zipUrl)
+    #Transpose df to have features as columns
     transposeDF = pdDF.pivot_table(index = ['REF_DATE','GEO','DGUID'], columns='Interprovincial migration', values='VALUE').reset_index(['REF_DATE','GEO','DGUID'])
     immigration_df = spark.createDataFrame(transposeDF,schema=immigration_schema).createOrReplaceTempView("immigration_info")
     avg_per_province = spark.sql("SELECT GEO, REF_DATE, DGUID, 'Persons' as uom_imm, 'units' as scalar_imm, In_migrants, Out_migrants FROM immigration_info")
