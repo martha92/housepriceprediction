@@ -55,5 +55,5 @@ def loadCrimeData():
     violations_df = pdDF.loc[pdDF['Violations'].isin(['Total, all violations'])]
     alltypesviol_df = violations_df.loc[pdDF['Statistics'].isin(['Rate per 100,000 population'])]
     crime_df = spark.createDataFrame(alltypesviol_df, schema=crime_schema).createOrReplaceTempView("crime_info")
-    crime_rates = spark.sql("SELECT GEO as province, REF_DATE, DGUID, 'Number' as uom_crime, 'unit' as scalar_crime, 'Total of all violations-Rate per 100,000 population' as statistic_crime, VALUE as crime_incidents FROM crime_info")
+    crime_rates = spark.sql("SELECT GEO, REF_DATE, DGUID, 'Number' as uom_crime, 'unit' as scalar_crime, 'Total of all violations-Rate per 100,000 population' as statistic_crime, VALUE as crime_incidents FROM crime_info")
     return crime_rates
