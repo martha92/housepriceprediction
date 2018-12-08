@@ -28,7 +28,7 @@ from keras.models import load_model
 # uploaded = files.upload()
 # import io
 # data = pd.read_csv(io.StringIO(uploaded['data.csv'].decode('utf-8')))
-data = pd.read_csv('Other_sources/data.csv')
+data = pd.read_csv('Code_no_agg/data.csv')
 data['REF_DATE_INT'] = data.REF_DATE.map(lambda x: int(x.replace('-', '')))
 
 # Removing the input Unit and Scale related columns from the file
@@ -206,10 +206,10 @@ valid['predict'] = reg_model.predict(valid[feature_columns])
 result['predicted_total_house_index'] = reg_model.predict(min_max_scaler(result[feature_columns]))
 
 # Saving the model and the file
-pkl_filename = "Result/regression_model.pkl"  
+pkl_filename = "Output/regression_model.pkl"
 with open(pkl_filename, 'wb') as file:  
     pickle.dump(reg_model, file)
-result.to_csv("Result/data_regression.csv", header='true')
+result.to_csv("Output/data_regression.csv", header='true')
 
 # Produce a plot for the results.
 for dguid in province_dguid:
