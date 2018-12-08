@@ -11,7 +11,7 @@ from urllib.request import *
 import getCodeSets as codesets
 
 spark = SparkSession.builder.appName('Load Income Data').getOrCreate()
-
+#Schema for income information
 income_schema = types.StructType([
     types.StructField('REF_DATE', types.StringType(), True),
     types.StructField('GEO', types.StringType(), True),
@@ -31,12 +31,12 @@ income_schema = types.StructType([
     types.StructField('TERMINATE', types.StringType(), True),
     types.StructField('DECIMALS', types.StringType(), True), ])
 
-
+'''
+	 * Description: This method is used to download and extract the zip file contents in memory.
+	 * input: String -> url of response.
+	 * output:  -> Panda DataFrame -> file contents.
+'''
 def download_extract_zip(url):
-    """
-    Download a ZIP file and extract its contents in memory
-    yields (filename, file-like object) pairs
-    """
     response = requests.get(url)
     with ZipFile(BytesIO(response.content)) as thezip:
         for zipinfo in thezip.infolist():
@@ -44,7 +44,11 @@ def download_extract_zip(url):
                 df = pd.read_csv(thefile)
                 return (df)
 
-
+'''
+	 * Description: This method is used to request income information, perform transformations and generate an output dataframe 
+	 * input: -
+	 * output:  DataFrame-> with income info per province and year-month
+'''
 def loadIncomeData():
     # PRODUCT ID FOR HOUSE PRICE INDEX.
     productId = "11100008"
@@ -53,9 +57,11 @@ def loadIncomeData():
     zipUrl = jdata['object']
     pdDF = download_extract_zip(zipUrl)
     income_df = spark.createDataFrame(pdDF, schema=income_schema).createOrReplaceTempView("income")
+    #Filter only features that we need.
     transform_income = spark.sql(
         "SELECT * FROM income WHERE Sex = 'Both sexes' AND Age_group = 'All age groups' AND Persons_with_income = '5-year percent change of median income' ").createOrReplaceTempView(
         "income_transformed")
+    #Get codesets description for uom and scalar units
     uom_df = codesets.getCodeDescription("uom").createOrReplaceTempView("uom")
     scalar_df = codesets.getCodeDescription("scalar").createOrReplaceTempView("scalar")
     join_income_uom_scalar = spark.sql("SELECT it.REF_DATE, it.GEO,  it.DGUID, uom.memberUomEn, scalar.scalarFactorDescEn, it.VALUE \
