@@ -148,7 +148,7 @@ def main():
     h.1y_fixed_posted, h.2y_bond, h.3y_bond, h.3y_fixed_posted, h.5y_bond, h.5y_fixed_posted, h.7y_bond, h.10y_bond, h.bank, h.overnight, h.overnight_target, h.prime, \
     w.Mean_Max_Temp,w.Mean_Min_Temp, w.Mean_Temp,w.Total_Rain,w.Total_Snow\
     FROM prev_plus_weather h \
-    LEFT JOIN weather_data w ON h.REF_DATE = w.REF_DATE AND h.DGUID = w.DGUID").coalesce(1)
+    LEFT JOIN weather_data w ON h.REF_DATE = w.REF_DATE AND h.DGUID = w.DGUID").repartition(1)
     prev_plus_weather.write.csv("data", mode='overwrite', header='true')
 
     print(prev_plus_weather.count())
