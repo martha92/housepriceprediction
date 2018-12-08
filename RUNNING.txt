@@ -14,18 +14,18 @@ Change the directory to be at the root level of the project and then run.
 
 3. Run web crawler to retrieve listing prices.
 
-*  scrapy runspider p2h.py -o part1.csv
-   Do this by changing startURLs for all the URLs commented  after the startURL variable. One file for each URL will be
-   obtained.
-* After getting the part files, run combine.py which will combine the part files into one  csv. Change the 'ipdir' path to the path where all the part files have been saved. Command:
-   python3 combine.py
+    -  scrapy runspider p2h.py -o part1.csv
+       Do this by changing startURLs for all the URLs commented  after the startURL variable. One file for each URL will be
+       obtained.
+    - After getting the part files, run combine.py which will combine the part files into one  csv. Change the 'ipdir' path to the path where all the part files have been saved. Command:
+       python3 combine.py
 
-*  Command for running clean.py:
-   spark-submit clean.py listingdata.csv  outfield
-   (Listing data.csv is a sample dataset obtained after combining the part files of data scraped)
-*  Command for running all other codes:
-   spark-submit xyz.py  newlistdata1.csv
-   (newlistdata1 is a sample dataset obtained after combining and cleaning)
+    -  Command for running clean.py:
+       spark-submit clean.py listingdata.csv  outfield
+       (Listing data.csv is a sample dataset obtained after combining the part files of data scraped)
+    -  Command for running all other codes:
+       spark-submit xyz.py  newlistdata1.csv
+       (newlistdata1 is a sample dataset obtained after combining and cleaning)
 
 4. Visualize in tableau. Output tableau worksheet is called Main-WB.twb
 
