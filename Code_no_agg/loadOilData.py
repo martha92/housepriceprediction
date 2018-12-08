@@ -13,6 +13,7 @@ spark = SparkSession.builder.master("local[*]").config("spark.executor.memory", 
                                                                                               "50g").config(
     "spark.memory.offHeap.enabled", True).config("spark.memory.offHeap.size", "32g").config(
     "spark.driver.maxResultSize", "10g").appName("Load Labour Force Data").getOrCreate()
+
 #Schema for Oil information
 oil_schema = types.StructType([
     types.StructField('REF_DATE', types.StringType(), True),
