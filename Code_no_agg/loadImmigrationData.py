@@ -9,6 +9,8 @@ from io import *
 import pandas as pd
 from urllib.request import *
 
+spark = SparkSession.builder.appName('Load Immigration Data').getOrCreate()
+
 #Schema for immigration information
 immigration_schema = types.StructType([
 	types.StructField('REF_DATE', types.StringType(), True),
@@ -48,4 +50,3 @@ def loadImmigrationData():
     immigration_df = spark.createDataFrame(transposeDF,schema=immigration_schema).createOrReplaceTempView("immigration_info")
     avg_per_province = spark.sql("SELECT GEO, REF_DATE, DGUID, 'Persons' as uom_imm, 'units' as scalar_imm, In_migrants, Out_migrants FROM immigration_info")
     return avg_per_province
-
