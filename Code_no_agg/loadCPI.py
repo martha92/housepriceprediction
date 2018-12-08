@@ -45,7 +45,7 @@ def loadCPI():
     #transpose table to have the features as columns.
     transposeDF = cpi_info.pivot_table(index = ['REF_DATE','GEO'], columns='Alternative measures', values='VALUE').reset_index(['REF_DATE','GEO'])
     cpi_df = spark.createDataFrame(transposeDF,schema=cpi_schema).createOrReplaceTempView("cpi_info")
-    avg_cpi_index = spark.sql("SELECT GEO, REF_DATE, 'Percent' as uom_cpi, 'unit' as scalar_cpi, VALUE as cpi_index FROM cpi_info")
+    avg_cpi_index = spark.sql("SELECT GEO as province, REF_DATE, 'Percent' as uom_cpi, 'unit' as scalar_cpi, VALUE as cpi_index FROM cpi_info")
     return avg_cpi_index
 
     
