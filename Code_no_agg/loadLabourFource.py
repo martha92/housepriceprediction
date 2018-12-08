@@ -14,6 +14,7 @@ spark = SparkSession.builder.master("local[*]").config("spark.executor.memory", 
     "spark.memory.offHeap.enabled", True).config("spark.memory.offHeap.size", "32g").config(
     "spark.driver.maxResultSize", "10g").appName("Load Labour Force Data").getOrCreate()
 
+#Schema for labour information
 labour_schema = types.StructType([
     types.StructField('REF_DATE', types.StringType(), True),
     types.StructField('GEO', types.StringType(), True),
@@ -34,7 +35,7 @@ labour_schema = types.StructType([
     types.StructField('SYMBOL', types.StringType(), True),
     types.StructField('TERMINATE', types.StringType(), True),
     types.StructField('DECIMALS', types.StringType(), True), ])
-
+#Schema for special labour characteristics information
 labource_charact_schema = types.StructType([
     types.StructField('REF_DATE', types.StringType(), True),
     types.StructField('GEO', types.StringType(), True),
@@ -49,12 +50,12 @@ labource_charact_schema = types.StructType([
     types.StructField('Unemployment', types.FloatType(), True),
     types.StructField('Unemployment_rate', types.FloatType(), True), ])
 
-
+'''
+	 * Description: This method is used to download and extract the zip file contents in memory.
+	 * input: String -> url of response.
+	 * output:  -> Panda DataFrame -> file contents.
+'''
 def download_extract_zip(url):
-    """
-    Download a ZIP file and extract its contents in memory
-    yields (filename, file-like object) pairs
-    """
     response = requests.get(url)
     with ZipFile(BytesIO(response.content)) as thezip:
         for zipinfo in thezip.infolist():
@@ -62,7 +63,11 @@ def download_extract_zip(url):
                 df = pd.read_csv(thefile)
                 return (df)
 
-
+'''
+	 * Description: This method is used to request labour information, perform transformations and generate an output dataframe 
+	 * input: -
+	 * output:  DataFrame-> with labour info per province and year-month
+'''
 def loadLabourForceData():
     # PRODUCT ID FOR LABOUR FORCE.
     productId = "14100287"
@@ -70,9 +75,11 @@ def loadLabourForceData():
     jdata = json.loads(response.text)
     zipUrl = jdata['object']
     pdDF = download_extract_zip(zipUrl)
+    #Filter only needed features
     new_df = pdDF.loc[pdDF['Sex'].isin(['Both sexes'])]
     seasonally_adjusted = new_df.loc[pdDF['Data type'].isin(['Seasonally adjusted'])]
     statistics = seasonally_adjusted.loc[pdDF['Statistics'].isin(['Estimate'])]
+    #Transpose DF to have features as column headers
     transposeDF = statistics.pivot_table(index=['REF_DATE', 'GEO', 'DGUID'], columns='Labour force characteristics',
                                          values='VALUE').reset_index(['REF_DATE', 'GEO', 'DGUID'])
     labour_ch_df = spark.createDataFrame(transposeDF, schema=labource_charact_schema).createOrReplaceTempView("labour_info")
