@@ -9,8 +9,9 @@ from io import *
 import pandas as pd
 from urllib.request import *
 
-spark = SparkSession.builder.appName('Load Tourism Data').getOrCreate()
+spark = SparkSession.builder.appName('Load Crime Data').getOrCreate()
 
+#Schema for Consumer Price Index
 crime_schema = types.StructType([
     types.StructField('REF_DATE', types.StringType(), True),
     types.StructField('GEO', types.StringType(), True),
@@ -29,12 +30,12 @@ crime_schema = types.StructType([
     types.StructField('TERMINATE', types.StringType(), True),
     types.StructField('DECIMALS', types.StringType(), True), ])
 
-
+'''
+	 * Description: This method is used to download and extract the zip file contents in memory.
+	 * input: String -> url of response.
+	 * output:  -> Panda DataFrame -> file contents.
+'''
 def download_extract_zip(url):
-    """
-    Download a ZIP file and extract its contents in memory
-    yields (filename, file-like object) pairs
-    """
     response = requests.get(url)
     with ZipFile(BytesIO(response.content)) as thezip:
         for zipinfo in thezip.infolist():
@@ -50,8 +51,9 @@ def loadCrimeData():
     jdata = json.loads(response.text)
     zipUrl = jdata['object']
     pdDF = download_extract_zip(zipUrl)
+    # filter out only crime features that are going to be used in the HPI analysis.
     violations_df = pdDF.loc[pdDF['Violations'].isin(['Total, all violations'])]
     alltypesviol_df = violations_df.loc[pdDF['Statistics'].isin(['Rate per 100,000 population'])]
     crime_df = spark.createDataFrame(alltypesviol_df, schema=crime_schema).createOrReplaceTempView("crime_info")
-    crime_rates = spark.sql("SELECT GEO, REF_DATE, DGUID, 'Number' as uom_crime, 'unit' as scalar_crime, 'Total of all violations-Rate per 100,000 population' as statistic_crime, VALUE as crime_incidents FROM crime_info")
+    crime_rates = spark.sql("SELECT GEO as province, REF_DATE, DGUID, 'Number' as uom_crime, 'unit' as scalar_crime, 'Total of all violations-Rate per 100,000 population' as statistic_crime, VALUE as crime_incidents FROM crime_info")
     return crime_rates
