@@ -17,7 +17,7 @@ Change the directory to be at the root level of the project and then run.
     -  scrapy runspider ListingPrices/p2h.py -o part1.csv
        Do this by changing startURLs for all the URLs commented  after the startURL variable. One file for each URL will be
        obtained.
-    - After getting the part files, run combine.py which will combine the part files into one  csv. Change the 'ipdir' path to the path where all the part files have been saved. Command:
+    - After getting the part files, run ListingPrices/combine.py which will combine the part files into one  csv. Change the 'ipdir' path to the path where all the part files have been saved. Command:
        python3 combine.py
 
     -  Command for running clean.py:
