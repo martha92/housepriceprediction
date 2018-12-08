@@ -10,7 +10,7 @@ from zipfile import ZipFile
 from pyspark.sql.functions import input_file_name
 
 spark = SparkSession.builder.appName('Load Weather Data').getOrCreate()
-
+#Schema for Weather Information
 weather_schema = types.StructType([
     types.StructField('REF_DATE', types.StringType(), True),
     types.StructField('Year', types.StringType(), True),
@@ -38,12 +38,12 @@ weather_schema = types.StructType([
     types.StructField('Spd_of_Max_Gust', types.StringType(), True),
     types.StructField('Spd of Max Gust_Flag', types.StringType(), True), ])
 
-
+'''
+	 * Description: This method is used to download and extract the zip file contents in memory.
+	 * input: String -> url of response.
+	 * output:  -> Panda DataFrame -> file contents.
+'''
 def download_extract_zip(url):
-    """
-    Download a ZIP file and extract its contents in memory
-    yields (filename, file-like object) pairs
-    """
     response = requests.get(url)
     with ZipFile(BytesIO(response.content)) as thezip:
         for zipinfo in thezip.infolist():
@@ -51,7 +51,11 @@ def download_extract_zip(url):
                 df = pd.read_csv(thefile)
                 return (df)
 
-
+'''
+	 * Description: This method is used to request house prince index information, perform transformations and generate an output dataframe 
+	 * input: -
+	 * output:  DataFrame-> with HPI info per province and year-month
+'''
 def get_dguid():
     productId = "18100205"
     response = requests.get("https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/" + productId + "/en")
@@ -69,7 +73,11 @@ def get_dguid():
         types.StructField('Total_house_land', types.StringType(), True)])
     return spark.createDataFrame(transposeDF, schema=land_schema).select('GEO', 'DGUID').drop_duplicates()
 
-
+'''
+	 * Description: This method is used to load weather data, perform transformations and generate an output dataframe 
+	 * input: -
+	 * output:  DataFrame-> with weather info per province and year-month
+'''
 def loadWeatherData():
     weather = spark.read.csv("Other_sources/weather", schema=weather_schema)
     weather.withColumn("input_file", input_file_name()).createOrReplaceTempView("weather_info")
