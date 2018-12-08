@@ -11,6 +11,7 @@ from urllib.request import *
 
 spark = SparkSession.builder.appName('Load Diverse Expenditures').getOrCreate()
 
+#Schema for Diverse Expenditures
 expeditures_schema = types.StructType([
     types.StructField('REF_DATE', types.StringType(), True),
     types.StructField('GEO', types.StringType(), True),
@@ -26,12 +27,12 @@ expeditures_schema = types.StructType([
     types.StructField('Taxes_transfer_landregistration_fees', types.StringType(), True),
     types.StructField('Education', types.StringType(), True)])
 
-
+'''
+	 * Description: This method is used to download and extract the zip file contents in memory.
+	 * input: String -> url of response.
+	 * output:  -> Panda DataFrame -> file contents.
+'''
 def download_extract_zip(url):
-    """
-    Download a ZIP file and extract its contents in memory
-    yields (filename, file-like object) pairs
-    """
     response = requests.get(url)
     with ZipFile(BytesIO(response.content)) as thezip:
         for zipinfo in thezip.infolist():
@@ -39,7 +40,11 @@ def download_extract_zip(url):
                 df = pd.read_csv(thefile)
                 return (df)
 
-
+'''
+	 * Description: This method is used to request diverse expenditures information, perform transformations and generate an output dataframe 
+	 * input: -
+	 * output:  DataFrame-> with diverse expenditures info per province and year-month
+'''
 def loadExpenditures():
     # PRODUCT ID FOR DIVERSE EXPENDITURES.
     productId = "11100222"
@@ -47,10 +52,12 @@ def loadExpenditures():
     jdata = json.loads(response.text)
     zipUrl = jdata['object']
     pdDF = download_extract_zip(zipUrl)
+    #Filter data only with features we needed.
     new_df = pdDF.loc[pdDF['Household expenditures, summary-level categories'].isin(
         ['Total expenditure', 'Food expenditures', 'Shelter', 'Principal accommodation', 'Rent',
          'Mortgage paid for owned living quarters', 'Mortgage insurance premiums for owned living quarters',
          'Transfer taxes and land registration fees for owned living quarters', 'Income taxes', 'Education'])]
+    #Transpose DF to have features as columns.
     transposeDF = new_df.pivot_table(index=['REF_DATE', 'GEO', 'DGUID'],
                                      columns='Household expenditures, summary-level categories',
                                      values='VALUE').reset_index(['REF_DATE', 'GEO', 'DGUID'])
