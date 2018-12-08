@@ -12,6 +12,7 @@ import getCodeSets as codesets
 
 spark = SparkSession.builder.appName('Load Housing Price').getOrCreate()
 
+#Schema for House information
 housing_schema = types.StructType([
     types.StructField('REF_DATE', types.StringType(), True),
     types.StructField('GEO', types.StringType(), True),
@@ -29,6 +30,7 @@ housing_schema = types.StructType([
     types.StructField('TERMINATED', types.StringType(), True),
     types.StructField('DECIMALS', types.StringType(), True), ])
 
+#Schema for Feature information only
 land_schema = types.StructType([
     types.StructField('REF_DATE', types.StringType(), True),
     types.StructField('GEO', types.StringType(), True),
@@ -37,7 +39,11 @@ land_schema = types.StructType([
     types.StructField('Land_only', types.StringType(), True),
     types.StructField('Total_house_land', types.StringType(), True), ])
 
-
+'''
+	 * Description: This method is used to download and extract the zip file contents in memory.
+	 * input: String -> url of response.
+	 * output:  -> Panda DataFrame -> file contents.
+'''
 def download_extract_zip(url):
     """
     Download a ZIP file and extract its contents in memory
@@ -50,7 +56,11 @@ def download_extract_zip(url):
                 df = pd.read_csv(thefile)
                 return (df)
 
-
+'''
+	 * Description: This method is used to request house price index information, perform transformations and generate an output dataframe 
+	 * input: -
+	 * output:  DataFrame-> with house price info per province and year-month
+'''
 def loadPriceIndex():
     # PRODUCT ID FOR HOUSE PRICE INDEX.
     productId = "18100205"
@@ -58,10 +68,14 @@ def loadPriceIndex():
     jdata = json.loads(response.text)
     zipUrl = jdata['object']
     pdDF = download_extract_zip(zipUrl)
+
+    #Transpose df to have features as columns
     transposeDF = pdDF.pivot_table(index=['REF_DATE', 'GEO', 'DGUID'], columns='New housing price indexes',
                                    values='VALUE').reset_index(['REF_DATE', 'GEO', 'DGUID'])
     land_df = spark.createDataFrame(transposeDF, schema=land_schema).createOrReplaceTempView("land_info")
     housing_df = spark.createDataFrame(pdDF, schema=housing_schema).createOrReplaceTempView("housing")
+
+    #Get uom and scalar description
     get_uom = spark.sql("SELECT uom_id FROM housing GROUP BY uom_id").collect()[0][0]
     get_scalar = spark.sql("SELECT scalar_id FROM housing GROUP BY scalar_id").collect()[0][0]
     uom_df = codesets.getCodeDescription("uom").createOrReplaceTempView("uom")
