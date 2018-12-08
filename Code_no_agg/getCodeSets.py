@@ -8,6 +8,8 @@ spark = SparkSession.builder.appName('Get Code Sets').getOrCreate()
 
 
 
+#Schema structure for all unit of measures used.
+
 scalar_schema = types.StructType([
 	types.StructField('scalarFactorCode', types.IntegerType(), True),
 	types.StructField('scalarFactorDescEn', types.StringType(), True),
@@ -37,6 +39,11 @@ classification_schema = types.StructType([
 	types.StructField('classificationTypeEn', types.StringType(), True),
 	types.StructField('classificationTypeFr', types.StringType(), True),])
 
+'''
+	 * Description: This method is used to decode based on the unit to retrieve which schema to use.
+	 * input: String -> type of codeset (i.e.  scalar, uom, etc)
+	 * output: String -> Schema to use.
+'''
 def options(type_):
 	options = {"scalar" : scalar_schema,
            "frequency" : frequency_schema,
@@ -46,7 +53,14 @@ def options(type_):
 	}
 	return options[type_]
 
+
+'''
+	 * Description: This method is used to get all the codesets. We used this method to retrieve the unit of measure and scalar unit descriptions.
+	 * input: String -> type of codeset (i.e.  scalar, uom, etc)
+	 * output: DataFrame -> with all the specified unit descriptions.
+'''
 def getCodeDescription(type_):
+	#Gather all code sets using the next webservice
     response = requests.get("https://www150.statcan.gc.ca/t1/wds/rest/getCodeSets")
     jdata = json.loads(response.text)
     keys = jdata['object']
