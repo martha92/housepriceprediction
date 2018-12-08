@@ -28,7 +28,7 @@ from keras.models import load_model
 # uploaded = files.upload()
 # import io
 # data = pd.read_csv(io.StringIO(uploaded['data.csv'].decode('utf-8')))
-data = pd.read_csv('Code_no_agg/data.csv')
+data = pd.read_csv('Code_no_agg/data/data.csv')
 data['REF_DATE_INT'] = data.REF_DATE.map(lambda x: int(x.replace('-', '')))
 
 # Removing the input Unit and Scale related columns from the file
@@ -168,8 +168,8 @@ valid['predict'] = model.predict(valid[feature_columns])
 
 result['predicted_total_house_index'] = model.predict(min_max_scaler(result[feature_columns]))
 
-model.save('Result/neural_network_model.h5')
-result.to_csv("Result/data_nn.csv", header='true')
+model.save('Output/neural_network_model.h5')
+result.to_csv("Output/data_nn.csv", header='true')
 
 # Produce a plot for the validation/test data for neural network model.
 
@@ -182,7 +182,7 @@ for dguid in province_dguid:
   plt.title('Neural Network Model - {}'.format(data.GEO.iloc[0]))
   plt.xlabel('Time')
   plt.xticks(rotation=45)
-  plt.savefig('Result/plot/NN_{}.png'.format(data.GEO.iloc[0]))
+  plt.savefig('Output/plot/NN_{}.png'.format(data.GEO.iloc[0]))
   plt.show()
 
 # Linear Regression Model for housing index prediction
@@ -221,7 +221,7 @@ for dguid in province_dguid:
   plt.title('Linear Regression - {}'.format(data.GEO.iloc[0]))
   plt.xlabel('Time')
   plt.xticks(rotation=45)
-  plt.savefig('Result/plot/Regression_{}.png'.format(data.GEO.iloc[0]))
+  plt.savefig('Output/plot/Regression_{}.png'.format(data.GEO.iloc[0]))
   plt.show()
 
 

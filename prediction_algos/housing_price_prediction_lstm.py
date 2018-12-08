@@ -28,7 +28,7 @@ from keras.models import load_model
 # uploaded = files.upload()
 # import io
 # data = pd.read_csv(io.StringIO(uploaded['data.csv'].decode('utf-8')))
-data = pd.read_csv('Code_no_agg/data.csv')
+data = pd.read_csv('Code_no_agg/data/data.csv')
 
 # Removing the unwanted features
 
@@ -156,7 +156,7 @@ predicted_train_df = pd.DataFrame({'REF_DATE': trainT, 'DGUID': trainD, 'predict
 
 predicted_df = pd.concat([predicted_train_df, predicted_valid_df])
 
-model.save('Result/lstm_model.h5')
+model.save('Output/lstm_model.h5')
 pd.merge(data, predicted_df, on=['REF_DATE', 'DGUID']).to_csv("Output/data_lstm.csv", header='true')
 
 # Produce a plot for the validation/test results.
@@ -168,7 +168,7 @@ for dguid in province_dguid:
   plt.legend(['Actual Index','Predicted Index'])
   plt.title('LSTM Model - {}'.format(validP[validD == dguid][0]))
   plt.xticks(rotation=45)
-  plt.savefig('Result/plot/LSTM_{}.png'.format(validP[validD == dguid][0]))
+  plt.savefig('Output/plot/LSTM_{}.png'.format(validP[validD == dguid][0]))
   plt.xlabel('Time')
   plt.show()
 
