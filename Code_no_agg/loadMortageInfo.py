@@ -5,7 +5,7 @@ from pyspark.sql import SparkSession, types
 from urllib.request import *
 
 spark = SparkSession.builder.appName('Load Mortage Data').getOrCreate()
-
+#Schema for Mortage Information
 mortage_schema = types.StructType([
     types.StructField('date', types.StringType(), True),
     types.StructField('1y_fixed_posted', types.StringType(), True),
@@ -21,7 +21,11 @@ mortage_schema = types.StructType([
     types.StructField('overnight_target', types.StringType(), True),
     types.StructField('prime', types.StringType(), True)])
 
-
+'''
+	 * Description: This method is used to request mortage information, perform transformations and generate an output dataframe 
+	 * input: -
+	 * output:  DataFrame-> with mortage info per province and year-month
+'''
 def loadMortageInfo():
     mortage = spark.read.csv("Other_sources/mortgage rate since 1935.csv", schema=mortage_schema).createOrReplaceTempView("mortage")
     transf_year_month = spark.sql(
